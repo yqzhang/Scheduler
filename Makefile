@@ -1,3 +1,7 @@
+# File: Makefile
+# Author: Yunqi Zhang
+# Email: yqzhang@ucsd.edu
+
 CC = gcc
 CCFLAGS =
 

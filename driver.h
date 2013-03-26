@@ -1,3 +1,9 @@
+/**
+ * File: driver.h
+ * Author: Yunqi Zhang
+ * Email: yqzhang@ucsd.edu
+ */
+
 #ifndef _DRIVER_H_
 #define _DRIVER_H_
 

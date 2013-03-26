@@ -1,3 +1,9 @@
+/**
+ * File: driver.c
+ * Author: Yunqi Zhang
+ * Email: yqzhang@ucsd.edu
+ */
+
 #include "driver.h"
 
 int main(int argc, char **argv) {

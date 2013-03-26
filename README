@@ -1,4 +1,18 @@
+/**
+ * File: README
+ * Author: Yunqi Zhang
+ * Email: yqzhang@ucsd.edu
+ */
+
 This repository contains a online scheduler for Linux kernel 3.8+.
+
+Makefile      Make file.
+driver.h      Header file for the main driver.
+driver.c      Source code for the main driver.
+profiler.h    Header file for PMU and RAPL sampling.
+profiler.c    Source code for PMU and RAPL sampling.
+scheduler.h   Header file for thread scheduling.
+scheduler.c   Source code for thread scheduling.
 
 Dependencies:
  - libpfm4: PMU events sampling
