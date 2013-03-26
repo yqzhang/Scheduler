@@ -1,5 +1,9 @@
 This repository contains a online scheduler for Linux kernel 3.8+.
 
 Dependencies:
- - libpfm4 (git clone git://perfmon2.git.sf.net/gitroot/perfmon2/libpfm4)
- - Linux kernel 3.8+ (git clone git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git)
+ - libpfm4: PMU events sampling
+    * (git clone git://perfmon2.git.sf.net/gitroot/perfmon2/libpfm4)
+ - Linux kernel 3.8+: perf_events for IvyBridge, especially for CYCLE_ACTIVITY
+    * (git clone git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git)
+ - PAPI: RAPL events sampling
+    * (git clone http://icl.utk.edu/git/papi.git)
