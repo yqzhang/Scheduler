@@ -1,0 +1,5 @@
+This repository contains a online scheduler for Linux kernel 3.8+.
+
+Dependencies:
+ - libpfm4 (git clone git://perfmon2.git.sf.net/gitroot/perfmon2/libpfm4)
+ - Linux kernel 3.8+ (git clone git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git)
