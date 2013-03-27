@@ -6,8 +6,10 @@
 
 This repository contains a online scheduler for Linux kernel 3.8+.
 
-src/
-include/
+Hmmm, there seems to be a better way to do this, check libpfm4/perf_examples/syst_smpl.c for detail later.
+
+src/        Source code of the scheduler.
+include/    Libraries needed from libpfm4.
 
 Dependencies:
  - libpfm4: PMU events sampling
