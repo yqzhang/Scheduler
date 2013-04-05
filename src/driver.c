@@ -31,15 +31,16 @@ int main(int argc, char **argv) {
   // Initialize the events to measure
   perf_event_desc_t **all_fds = NULL;
   int *num_fds = NULL;
-  initialize(all_fds, num_fds);
+  int ncpus = initialize(all_fds, num_fds);
 
   // Read the work load from file
-  simulate(N, file);
+  // simulate(N, file);
+  measure(all_fds, num_fds, ncpus, MEASURE_PERIOD);
 
   return 0;
 }
 
-bool initialize(perf_event_desc_t **all_fds, int *num_fds) {
+int initialize(perf_event_desc_t **all_fds, int *num_fds) {
   // TODO: The list of the events to measure
   const char *EVENTS = {"cycles"};
   // TODO: The list of the events to measure
@@ -47,7 +48,7 @@ bool initialize(perf_event_desc_t **all_fds, int *num_fds) {
   int ret = pfm_initialize();
   
   if (ret != PFM_SUCCESS) {
-    return false;
+    return -1;
   }
 
   int ncpus = sysconf(_SC_NPROCESSORS_ONLN);
@@ -68,9 +69,28 @@ bool initialize(perf_event_desc_t **all_fds, int *num_fds) {
     //printf("CPU: %d, RET: %d, NUM_FDS: %d\n", c, ret, num_fds[c]);
   }
 
-  return true;
+  return ncpus;
 }
 
-void simulate(int N, FILE *file) {
-  
+void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period) {
+  while (period--) {
+    sleep(10);
+
+    // TODO:
+    // read and scale the counters every some seconds
+    // re-schedule the threads based on profiling
+  }
+}
+
+void cleanup (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
+  int i, c;
+
+  for (c = 0; c < ncpus; c++) {
+    for (i = 0; i < num_fds[c]; i++) {
+      close(all_fds[c][i].fd);
+    }
+    perf_free_fds(all_fds[c], num_fds[c]);
+  }
+
+  return ;
 }

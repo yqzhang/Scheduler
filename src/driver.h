@@ -26,8 +26,11 @@
 #define NUMBER_OF_CORES 4
 #define THREAD_PER_CORE 2
 
+#define MEASURE_PERIOD 1000
+
 int main (int argc, char **argv);
-bool initialize (perf_event_desc_t **all_fds, int *num_fds);
-void simulate (int N, FILE *file);
+int initialize (perf_event_desc_t **all_fds, int *num_fds);
+void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period);
+void cleanup (perf_event_desc_t **all_fds, int *num_fds, int ncpus);
 
 #endif
