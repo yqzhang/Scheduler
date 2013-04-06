@@ -13,5 +13,6 @@ lib/        Libraries needed from libpfm4.
 Dependencies:
  - libpfm4: PMU events sampling
     * (git clone git://perfmon2.git.sf.net/gitroot/perfmon2/libpfm4)
- - Linux kernel 3.8+: perf_events for IvyBridge, especially for CYCLE_ACTIVITY
-    * (git clone git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git)
+ - libproc (procps): the /proc file system utilities
+    * (wget http://procps.sourceforge.net/procps-3.2.8.tar.gz)
+    * (sudo apt-get install libproc-dev)

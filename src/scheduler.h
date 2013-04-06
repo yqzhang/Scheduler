@@ -7,6 +7,10 @@
 #ifndef _SCHEDULER_H_
 #define _SCHEDULER_H_
 
-void schedule();
+#include <proc/readproc.h>
+
+#include "perf_util.h"
+
+void schedule(perf_event_desc_t **all_fds, int *num_fds, int ncpus);
 
 #endif

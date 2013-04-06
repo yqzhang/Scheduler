@@ -82,7 +82,7 @@ void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period) 
     profile (all_fds, num_fds, ncpus);
 
     // Second step: re-scheduling based on the profiling
-    schedule ();
+    schedule (all_fds, num_fds, ncpus);
   }
 }
 
