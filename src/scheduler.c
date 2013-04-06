@@ -5,3 +5,7 @@
  */
 
 #include "scheduler.h"
+
+void schedule() {
+  return ;
+}
