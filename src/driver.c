@@ -34,8 +34,8 @@ int main(int argc, char **argv) {
   int ncpus = initialize(all_fds, num_fds);
 
   // Read the work load from file
-  // simulate(N, file);
-  measure(all_fds, num_fds, ncpus, MEASURE_PERIOD);
+  int time_period = MEASURE_PERIOD;
+  measure(all_fds, num_fds, ncpus, time_period);
 
   return 0;
 }
@@ -76,10 +76,10 @@ void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period) 
 
   // Doing a profiling and a re-scheduling each period of time
   while (period--) {
-    sleep(10);
+    //sleep(10);
 
     // First step: profiling
-    profile (all_fds, num_fds, ncpus);
+    //profile (all_fds, num_fds, ncpus);
 
     // Second step: re-scheduling based on the profiling
     schedule (all_fds, num_fds, ncpus);
