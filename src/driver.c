@@ -37,6 +37,9 @@ int main(int argc, char **argv) {
   int time_period = MEASURE_PERIOD;
   measure(all_fds, num_fds, ncpus, time_period);
 
+  // Clean up
+  cleanup (all_fds, num_fds, ncpus);
+
   return 0;
 }
 

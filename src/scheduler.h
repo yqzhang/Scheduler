@@ -28,5 +28,6 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus);
 int getRunningProcess ();
 bool filter (char *str1);
 int mask2int (cpu_set_t *mask);
+inline int getNext (bool ifUsed[], int offset);
 
 #endif

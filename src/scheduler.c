@@ -34,6 +34,38 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
   // Calculate the best mapping
   // Brute force
   // TODO
+  bool ifUsed[CPU_SETSIZE];
+  int best_sol = 0;
+  float best_val = -10000.0;
+  for (i = 0; i < 105; i++) {
+    float cur_val = 0.0;
+    for (j = 0; j < CPU_SETSIZE; j++) ifUsed[j] = false;
+    
+    // 1st Core
+    int left = getNext (ifUsed, 0);
+    int right = getNext (ifUsed, i / 15);
+    cur_val += benefit_matrix[left][right] + benefit_matrix[right][left];
+
+    // 2nd Core
+    left = getNext (ifUsed, 0);
+    right = getNext (ifUsed, (i % 15) / 3);
+    cur_val += benefit_matrix[left][right] + benefit_matrix[right][left];
+
+    // 3rd Core
+    left = getNext (ifUsed, 0);
+    right = getNext (ifUsed, ((i % 15) % 3));
+    cur_val += benefit_matrix[left][right] + benefit_matrix[right][left];
+
+    // 4th Core
+    left = getNext(ifUsed, 0);
+    right = getNext(ifUsed, 0);
+    cur_val += benefit_matrix[left][right] + benefit_matrix[right][left];
+
+    if (cur_val > best_val) {
+      best_val = cur_val;
+      best_sol = i;
+    }
+  }
 
   // TODO: Calculate the best migration solution
   //       Brute force
@@ -88,4 +120,16 @@ int mask2int (cpu_set_t *cmask) {
   }
 
   return -1;
+}
+
+inline int getNext (bool ifUsed[], int offset) {
+  int from = 0;
+  while (ifUsed[from] == true) from++;
+  for ( ; offset > 0; from++) {
+    if (ifUsed[from] == false) {
+      offset--;
+    }
+  }
+  ifUsed[from] = true;
+  return from;
 }
