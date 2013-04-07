@@ -14,7 +14,7 @@
 
 #include "perf_util.h"
 
-#define MAX_RUNNING_PROCESS 10
+#define MAX_RUNNING_PROCESS CPU_SETSIZE
 
 struct proc {
   int pid;
