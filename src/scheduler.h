@@ -18,7 +18,8 @@
 
 struct proc {
   int pid;
-  int core;
+  int affinity;
+  int migrate;
 };
 
 typedef struct proc process;
@@ -26,6 +27,6 @@ typedef struct proc process;
 void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus);
 int getRunningProcess ();
 bool filter (char *str1);
-int mask2int (cpu_set_t mask, int ncpus);
+int mask2int (cpu_set_t *mask);
 
 #endif

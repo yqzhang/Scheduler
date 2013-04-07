@@ -13,9 +13,29 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
 
   int i;
   cpu_set_t cmask;
+
   for (i = 0; i < num_proc; i++) {
-    sched_setaffinity (proc_list[i].pid, ncpus, &cmask);
-    printf("affinity: %ld\n", (unsigned long int)cmask.__bits[0]);//mask2int (cmask, ncpus));
+    CPU_ZERO (&cmask);
+    sched_getaffinity (proc_list[i].pid, sizeof(cpu_set_t), &cmask);
+    proc_list[i].affinity = mask2int (&cmask);
+    //printf("affinity: %d\n", proc_list[i].affinity);
+  }
+
+  // TODO: Calculate the benefit matrix
+  //       Regression model
+
+  // TODO: Calculate the best mapping
+  //       Brute force
+
+  // TODO: Calculate the best migration solution
+  //       Brute force
+
+  for (i = 0; i < num_proc; i++) {
+    if (proc_list[i].migrate != proc_list[i].affinity) {
+      CPU_ZERO (&cmask);
+      CPU_SET (proc_list[i].migrate, &cmask);
+      sched_setaffinity (proc_list[i].pid, sizeof(cpu_set_t), &cmask);
+    }
   }
 
   return ;
@@ -30,7 +50,7 @@ int getRunningProcess () {
   int num_proc = 0;
   while (readproc (proc, &proc_info) != NULL) {
     if (filter (proc_info.cmd) && proc_info.state == 'R') {
-      printf("%s", proc_info.cmd);
+      //printf("%s\n", proc_info.cmd);
       proc_list[num_proc++].pid = proc_info.tid;
     }
   }
@@ -49,10 +69,11 @@ bool filter (char *str1) {
   return true;
 }
 
-int mask2int (cpu_set_t mask, int ncpus) {
+int mask2int (cpu_set_t *cmask) {
   int i;
-  for (i = 0; i < ncpus; i++) {
-    if (mask.__bits[i] == 1) {
+
+  for (i = 0; i < CPU_SETSIZE; i++) {
+    if (CPU_ISSET (i, cmask)) {
       return i;
     }
   }
