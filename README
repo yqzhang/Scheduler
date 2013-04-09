@@ -15,4 +15,4 @@ Dependencies:
     * (git clone git://perfmon2.git.sf.net/gitroot/perfmon2/libpfm4)
  - libproc (procps): the /proc file system utilities
     * (wget http://procps.sourceforge.net/procps-3.2.8.tar.gz)
-    * (sudo apt-get install libproc-dev)
+    * (sudo apt-get install libproc-dev / libprocps0-dev)
