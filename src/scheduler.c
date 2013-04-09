@@ -67,8 +67,67 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
     }
   }
 
-  // TODO: Calculate the best migration solution
-  //       Brute force
+  int map[CPU_SETSIZE];
+  for (j = 0; j < CPU_SETSIZE; j++) ifUsed[j] = false;
+  map[getNext (ifUsed, 0)] = 0;
+  map[getNext (ifUsed, best_sol / 15)] = 0;
+  map[getNext (ifUsed, 0)] = 1;
+  map[getNext (ifUsed, (best_sol % 15) / 3)] = 1;
+  map[getNext (ifUsed, 0)] = 2;
+  map[getNext (ifUsed, ((best_sol % 15) % 3))] = 2;
+  map[getNext (ifUsed, 0)] = 3;
+  map[getNext (ifUsed, 0)] = 3;
+
+  // Calculate the best migration solution
+  // Brute force
+  int perm[] = {0, 1, 2, 3};
+  int best_mig[] = {0, 1, 2, 3};
+  bool ifFinished = false;
+  int minMigration = CPU_SETSIZE;
+  while (ifFinished) {
+    int mig = calculateMigration (map, perm, num_proc);
+    if (mig < minMigration) {
+      minMigration = mig;
+      best_mig[0] = perm[0];
+      best_mig[1] = perm[1];
+      best_mig[2] = perm[2];
+      best_mig[3] = perm[3];
+    }
+
+    for (i = CPU_SETSIZE / 2 - 2; i >= 0; i--) {
+      if (perm[i] < perm[i + 1]) {
+        break;
+      }
+    }
+
+    if (i == -1) ifFinished = true;
+    else {
+      int ceilIndex = findCeil (perm, perm[i], i + 1, CPU_SETSIZE - 1);
+      swap (&perm[i], &perm[ceilIndex]);
+      reverse (perm, i + 1, CPU_SETSIZE - 1);
+    }
+  }
+
+  // Calculate affinity
+  for (i = 0; i < CPU_SETSIZE; i++) ifUsed[i] = false;
+  for (i = 0; i < num_proc; i++) {
+    if (proc_list[i].affinity % (CPU_SETSIZE / 2) == best_mig[map[i]]) {
+      ifUsed[proc_list[i].affinity] = true;
+      proc_list[i].migrate = proc_list[i].affinity;
+    }
+  }
+  for (i = 0; i < num_proc; i++) {
+    if (proc_list[i].affinity % (CPU_SETSIZE / 2) != best_mig[map[i]]) {
+      if (ifUsed[best_mig[map[i]]] == false) {
+        ifUsed[best_mig[map[i]]] = true;
+        proc_list[i].migrate = best_mig[map[i]];
+      }
+      else {
+        ifUsed[best_mig[map[i]] + (CPU_SETSIZE / 2)] = true;
+        proc_list[map[i]].migrate = best_mig[map[i]] + (CPU_SETSIZE / 2);
+      }
+    }
+  }
 
   // Set process affinity
   for (i = 0; i < num_proc; i++) {
@@ -132,4 +191,39 @@ inline int getNext (bool ifUsed[], int offset) {
   }
   ifUsed[from] = true;
   return from;
+}
+
+void swap (int *a, int *b) {
+  char t = *a;
+  *a = *b;
+  *b = t;
+}
+
+int findCeil (int perm[], int first, int l, int h) {
+  int i, ceilIndex = l;
+  for (i = l + 1; i <= h; i++) {
+    if (perm[i] > first && perm[i] < perm[ceilIndex]) {
+      ceilIndex = i;
+    }
+  }
+  return ceilIndex;
+}
+
+void reverse (int perm[], int l, int h) {
+  while (l < h) {
+    swap (&perm[l], &perm[h]);
+    l++;
+    h--;
+  }
+}
+
+int calculateMigration (int map[], int perm[], int num_proc) {
+  int mig = 0;
+  int i;
+  for (i = 0; i < num_proc; i++) {
+    if (proc_list[i].affinity % (CPU_SETSIZE / 2) != perm[map[i]]) {
+      mig++;
+    }
+  }
+  return mig;
 }

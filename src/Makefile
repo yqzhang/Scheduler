@@ -23,7 +23,7 @@ LPC_UTILS_HDR=perf_util.h
 TARGETS+=onlineSch
 
 $(TARGETS): driver.o scheduler.o profiler.o perf_util.o
-	$(CC) $(CFLAGS) -o driver.c scheduler.c profiler.c -o onlineSch -lproc -g $(LDFLAGS) $< $(LPC_UTILS) $(PFMLIB) $(LIBS)
+	$(CC) $(CFLAGS) -o driver.c scheduler.c profiler.c -o onlineSch -lprocps -g $(LDFLAGS) $< $(LPC_UTILS) $(PFMLIB) $(LIBS)
 
 $(LPC_UTILS): $(LPC_UTILS_HDR)
 

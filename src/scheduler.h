@@ -29,5 +29,9 @@ int getRunningProcess ();
 bool filter (char *str1);
 int mask2int (cpu_set_t *mask);
 inline int getNext (bool ifUsed[], int offset);
+void swap (int *a, int *b);
+int findCeil (int perm[], int first, int l, int h);
+void reverse (int perm[], int l, int h);
+int calculateMigration (int map[], int perm[], int num_proc);
 
 #endif
