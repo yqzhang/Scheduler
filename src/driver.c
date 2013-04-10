@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
   measure(all_fds, num_fds, ncpus, time_period);
 
   // Clean up
-  cleanup (all_fds, num_fds, ncpus);
+  //cleanup (all_fds, num_fds, ncpus);
 
   return 0;
 }
@@ -79,13 +79,15 @@ void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period) 
 
   // Doing a profiling and a re-scheduling each period of time
   while (period--) {
-    //sleep(10);
+    usleep(100*1000);
+    //printf("Sleep\n");
 
     // First step: profiling
     //profile (all_fds, num_fds, ncpus);
 
     // Second step: re-scheduling based on the profiling
     schedule (all_fds, num_fds, ncpus);
+    //printf("Schedule\n");
   }
 }
 

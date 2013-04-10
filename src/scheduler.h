@@ -11,6 +11,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <sched.h>
+#include <stdlib.h>
 
 #include "perf_util.h"
 

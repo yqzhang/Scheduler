@@ -27,7 +27,7 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
   for (i = 0; i < CPU_SETSIZE; i++) {
     for (j = 0; j < CPU_SETSIZE; j++) {
       // TODO: Result of the regression model
-      benefit_matrix[i][j] = 1.0;
+      benefit_matrix[i][j] = rand() % 100;
     }
   }
 
@@ -131,6 +131,10 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
 
   // Set process affinity
   for (i = 0; i < num_proc; i++) {
+    //
+    proc_list[i].migrate = 1 - proc_list[i].affinity;
+    //
+    //printf ("affinity: %d, migrate: %d\n", proc_list[i].affinity, proc_list[i].migrate);
     if (proc_list[i].migrate != proc_list[i].affinity) {
       CPU_ZERO (&cmask);
       CPU_SET (proc_list[i].migrate, &cmask);
@@ -165,8 +169,9 @@ bool filter (char *str1) {
     return false;
   //if (strstr (str1, "base") == NULL)
   //  return false;
-
+  if (strstr (str1, "test") != NULL)
   return true;
+  return false;
 }
 
 int mask2int (cpu_set_t *cmask) {
