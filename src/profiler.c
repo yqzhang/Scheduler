@@ -14,8 +14,10 @@ void profile (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
     fds = all_fds[c];
 
     for (i = 0; i < num_fds[c]; i++) {
-      //uint64_t val, delta;
-      //double ratio;
+      /*
+      uint64_t val, delta;
+      double ratio;
+      */
 
       ret = read (fds[i].fd, fds[i].values, sizeof(fds[i].values));
 
@@ -29,9 +31,11 @@ void profile (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
 
       // Scaling because we may sharing the PMU
       // and thus may be multiplexed
-      //val = perf_scale (fds[i].values);
-      //ratio = perf_scale_ratio (fds[i].values);
-      //delta = perf_scale_delta (fds[i].values, fds[i].prev_values);
+      /*
+      val = perf_scale (fds[i].values);
+      ratio = perf_scale_ratio (fds[i].values);
+      delta = perf_scale_delta (fds[i].values, fds[i].prev_values);
+      */
 
       // Might print something out here if something go wrong
 

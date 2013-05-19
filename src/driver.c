@@ -7,19 +7,24 @@
 #include "driver.h"
 
 int main(int argc, char **argv) {
+  /*
   if (argc < 3) {
     printf("Usage: ./driver <N <Number of threads: 2, 4, 8>>\n");
     printf("                <path <Path of the file contains the workloads>>\n");
     exit(1);
   }
+  */
 
+  /*
   // Number of threads
   int N = atoi(argv[1]);
   if (N != 2 && N != 4 && N != 8) {
     printf("Error: Number of threads should be 2, 4, 8.\n");
     exit(1);
   }
+  */
 
+  /*
   // Open the file contains workloads
   char* path = argv[2];
   FILE* file = fopen(path, "r");
@@ -27,6 +32,7 @@ int main(int argc, char **argv) {
     printf("Error: The file %s doesn't exist or can't be opened.\n", path);
     //exit(1);
   }
+  */
 
   // Initialize the events to measure
   perf_event_desc_t **all_fds = NULL;
@@ -38,7 +44,7 @@ int main(int argc, char **argv) {
   measure(all_fds, num_fds, ncpus, time_period);
 
   // Clean up
-  //cleanup (all_fds, num_fds, ncpus);
+  cleanup (all_fds, num_fds, ncpus);
 
   return 0;
 }
@@ -63,13 +69,11 @@ int initialize(perf_event_desc_t **all_fds, int *num_fds) {
     int ret = perf_setup_list_events(EVENTS, &all_fds[c], &num_fds[c]);
     all_fds[c][0].fd = -1;
     for (i = 0; i < num_fds[c]; i++) {
-      all_fds[c][i].hw.disabled = 0;
+      all_fds[c][i].hw.disabled = !i;
       all_fds[c][i].hw.read_format = PERF_FORMAT_SCALE;
-      all_fds[c][i].fd = perf_event_open(&all_fds[c][i].hw, -1, c, -1, 0);
+      all_fds[c][i].fd = perf_event_open(&all_fds[c][i].hw, -1, c, all_fds[c][0].fd, 0);
       printf("CPU: %d, RET: %d, NUM_FDS: %d, fd:%d\n", c, ret, num_fds[c], all_fds[c][i].fd);
-
     }
-    //printf("CPU: %d, RET: %d, NUM_FDS: %d\n", c, ret, num_fds[c]);
   }
 
   return ncpus;
@@ -80,7 +84,6 @@ void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period) 
   // Doing a profiling and a re-scheduling each period of time
   while (period--) {
     usleep(100*1000);
-    //printf("Sleep\n");
 
     // First step: profiling
     //profile (all_fds, num_fds, ncpus);
