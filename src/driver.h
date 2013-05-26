@@ -29,6 +29,8 @@
 #define MEASURE_PERIOD 1000
 #define MAX_GROUPS 16
 
+#define MAX_ENERGY_COUNT 0xFFFFFFFF
+
 typedef struct {
     const char *events;
     int num_groups;

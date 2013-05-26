@@ -80,9 +80,10 @@ int initialize() {
 
 void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period, int energy_fd) {
   // Read msr for power information
-  long long result;
   double power_units, energy_units, time_units;
-  double package_before, package_after;
+  long long result_before, result_after;
+  int64_t result_delta;
+  double package_power;
 
   result = read_msr (energy_fd, MSR_RAPL_POWER_UNIT);
   power_units = pow (0.5, (double)(result & 0xf));
@@ -90,8 +91,7 @@ void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period, 
   time_units = pow (0.5, (double)((result >> 16) & 0xf));
 
   // Get the original numbers for power
-  read_msr(fd, MSR_PKG_ENERGY_STATUS);
-  package_before = (double)result * energy_units;
+  result_before = read_msr(fd, MSR_PKG_ENERGY_STATUS);
 
   // Doing a profiling and a re-scheduling each period of time
   while (period--) {
@@ -104,10 +104,16 @@ void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period, 
     schedule (all_fds, num_fds, ncpus);
 
     // Third step: read msr for energy
-    read_msr(fd, MSR_PKG_ENERGY_STATUS);
-    package_after = (double)result * energy_units;
-    printf("Package power: %.6fJ consumed\n", (package_after - package_before));
-    package_before = package_after;
+    result_after = read_msr(fd, MSR_PKG_ENERGY_STATUS);
+    if (package_after < package_before) {
+        result_delta = (int64_t) package_after + (int64_t) (MAX_ENERGY_COUNT - package_before);
+    }
+    else {
+        result_delta = (int64_t) package_after - (int64_t) package_before;
+    }
+    package_power = (double) result_delta * energy_units;
+    printf("Package power: %.6fJ consumed\n", package_power);
+    result_before = result_after;
   }
 }
 
