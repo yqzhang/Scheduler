@@ -160,7 +160,7 @@ int getRunningProcess () {
 
 bool filter (char *str1) {
   if (strstr (str1, "onlineSch") != NULL)
-    return false;
+    return true;
   //if (strstr (str1, "base") == NULL)
   //  return false;
   if (strstr (str1, "test") != NULL)

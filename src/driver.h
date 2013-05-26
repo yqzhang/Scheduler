@@ -27,9 +27,17 @@
 #define THREAD_PER_CORE 2
 
 #define MEASURE_PERIOD 1000
+#define MAX_GROUPS 16
+
+typedef struct {
+    const char *events;
+    int num_groups;
+} options_t;
+
+static options_t options;
 
 int main (int argc, char **argv);
-int initialize (perf_event_desc_t **all_fds, int *num_fds);
+int initialize ();
 void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period);
 void cleanup (perf_event_desc_t **all_fds, int *num_fds, int ncpus);
 
