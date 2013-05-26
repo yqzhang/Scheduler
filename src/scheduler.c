@@ -158,15 +158,15 @@ int getRunningProcess () {
   return num_proc;
 }
 
+/* This might be what you are looking for */
 bool filter (char *str1) {
+  /* return false for the thread you don't want to touch */
+  /* return true for the thread you want to schedule */
   if (strstr (str1, "onlineSch") != NULL)
-    return true;
-  //if (strstr (str1, "base") == NULL)
-  //  return false;
-  if (strstr (str1, "test") != NULL)
-  return true;
+    return false;
   return false;
 }
+/* This might be what you are looking for */
 
 inline int getNext (bool ifUsed[], int offset) {
   int from = 0;
