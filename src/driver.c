@@ -15,7 +15,8 @@ int main(int argc, char **argv) {
 
   // Read the work load from file
   int time_period = MEASURE_PERIOD;
-  measure(all_fds, num_fds, ncpus, time_period);
+  int energy_fd = open_msr(0);
+  measure(all_fds, num_fds, ncpus, time_period, energy_fd);
 
   // Clean up
   cleanup (all_fds, num_fds, ncpus);
@@ -77,7 +78,21 @@ int initialize() {
   return ncpus;
 }
 
-void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period) {
+void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period, int energy_fd) {
+  // Read msr for power information
+  long long result;
+  double power_units, energy_units, time_units;
+  double package_before, package_after;
+
+  result = read_msr (energy_fd, MSR_RAPL_POWER_UNIT);
+  power_units = pow (0.5, (double)(result & 0xf));
+  energy_units = pow (0.5, (double)((result >> 8) & 0x1f));
+  time_units = pow (0.5, (double)((result >> 16) & 0xf));
+
+  // Get the original numbers for power
+  read_msr(fd, MSR_PKG_ENERGY_STATUS);
+  package_before = (double)result * energy_units;
+
   // Doing a profiling and a re-scheduling each period of time
   while (period--) {
     sleep(1);
@@ -87,7 +102,12 @@ void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period) 
 
     // Second step: re-scheduling based on the profiling
     schedule (all_fds, num_fds, ncpus);
-    printf("Schedule\n");
+
+    // Third step: read msr for energy
+    read_msr(fd, MSR_PKG_ENERGY_STATUS);
+    package_after = (double)result * energy_units;
+    printf("Package power: %.6fJ consumed\n", (package_after - package_before));
+    package_before = package_after;
   }
 }
 
@@ -102,4 +122,38 @@ void cleanup (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
   }
 
   return ;
+}
+
+int open_msr (int core) {
+    char msr_filename[BUFSIZ];
+    int fd;
+
+    sprintf(msr_filename, "/dev/cpu/%d/msr", core);
+    fd = open (msr_filename, O_RDONLY);
+    if (fd < 0) {
+        if (errno == ENXIO) {
+            fprintf (stderr, "rdmsr: No CPU %d\n", core);
+            exit(2);
+        } else if (errno == EIO) {
+            fprintf(stderr, "rdmsr: CPU %d doesn't support MSRs\n", core);
+            exit(3);
+        } else {
+            perror("rdmsr:open");
+            fprintf(stderr, "Trying to open %s\n", msr_filename);
+            exit(127);
+        }
+    }
+
+    return fd;
+}
+
+long long read_msr (int fd, int which) {
+    uint64_t data;
+
+    if ( pread(fd, &data, sizeof(data), which) != sizeof(data) ) {
+        perror("rdmsr:pread");
+        exit(127);
+    }
+    
+    return (long long) data;
 }

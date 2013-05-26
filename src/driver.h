@@ -40,5 +40,7 @@ int main (int argc, char **argv);
 int initialize ();
 void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period);
 void cleanup (perf_event_desc_t **all_fds, int *num_fds, int ncpus);
+int open_msr (int core);
+long long read_msr (int fd, int which);
 
 #endif
