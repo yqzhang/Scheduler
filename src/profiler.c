@@ -69,7 +69,7 @@ read_groups(perf_event_desc_t *fds, int num)
 }
 
 
-void profile (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
+void profile (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_matrix[][10]) {
   int c, i;
   perf_event_desc_t *fds;
 
@@ -78,14 +78,13 @@ void profile (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
     read_groups(fds, num_fds[c]);
 
     for (i = 0; i < num_fds[c]; i++) {
-      uint64_t val, delta;
-      double ratio;
+      uint64_t delta;
 
-      // Scaling because we may sharing the PMU
-      // and thus may be multiplexed
-      val = perf_scale (fds[i].values);
-      ratio = perf_scale_ratio (fds[i].values);
+      // Might print something out here if something go wrong
+      //val = perf_scale (fds[i].values);
+      //ratio = perf_scale_ratio (fds[i].values);
       delta = perf_scale_delta (fds[i].values, fds[i].prev_values);
+      /*
 	  printf("%'20"PRIu64" %'20"PRIu64" %s (%.2f%% scaling, ena=%'"PRIu64", run=%'"PRIu64")\n",
 			val,
 			delta,
@@ -93,8 +92,8 @@ void profile (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
 			(1.0-ratio)*100.0,
 			fds[i].values[1],
 			fds[i].values[2]);
-
-      // Might print something out here if something go wrong
+      */
+      pmu_matrix[c][i] = delta;
 
       // Set the values of the previous read
       fds[i].prev_values[0] = fds[i].values[0];

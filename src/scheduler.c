@@ -9,7 +9,7 @@
 static process proc_list[MAX_RUNNING_PROCESS];
 static float benefit_matrix[CPU_SETSIZE][CPU_SETSIZE];
 
-void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
+void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_matrix[][10]) {
   int num_proc = getRunningProcess();
 
   int i, j;
@@ -20,9 +20,29 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus) {
   for (i = 0; i < CPU_SETSIZE; i++) {
     for (j = 0; j < CPU_SETSIZE; j++) {
       // TODO: Result of the regression model
-      benefit_matrix[i][j] = rand() % 100;
+      benefit_matrix[i][j] = 1;
+      if (i >= num_proc || j >= num_proc) continue;
+      if (proc_list[i].affinity % NUMBER_OF_CORES == proc_list[j].affinity % NUMBER_OF_CORES) {
+        // call smt regression
+        benefit_matrix[i][j] = 1;
+      }
+      else {
+        // call cmp regression
+        benefit_matrix[i][j] = 1;
+      }
     }
   }
+
+  /* print the pmu counters for debug */
+  printf("---------------------------------------\n");
+  for (i = 0; i < CPU_SETSIZE; i++) {
+    for (j = 0; j < 10; j++) {
+      printf("PMU_%d: %lf\t", j, pmu_matrix[i][j]);
+    }
+    printf("\n");
+  }
+  printf("---------------------------------------\n");
+  /* print the pmu counters for dubug */
 
   // Calculate the best mapping
   // Brute force

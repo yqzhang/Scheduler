@@ -8,6 +8,7 @@
 
 perf_event_desc_t **all_fds = NULL;
 int *num_fds = NULL;
+static double pmu_matrix[CPU_SETSIZE][10];
 
 int main(int argc, char **argv) {
   // Initialize the events to measure
@@ -98,10 +99,10 @@ void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period, 
     sleep(1);
 
     // First step: profiling
-    profile (all_fds, num_fds, ncpus);
+    profile (all_fds, num_fds, ncpus, pmu_matrix);
 
     // Second step: re-scheduling based on the profiling
-    schedule (all_fds, num_fds, ncpus);
+    schedule (all_fds, num_fds, ncpus, pmu_matrix);
 
     // Third step: read msr for energy
     result_after = read_msr(energy_fd, MSR_PKG_ENERGY_STATUS);

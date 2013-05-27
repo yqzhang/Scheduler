@@ -52,6 +52,8 @@
 
 #define MSR_RAPL_POWER_UNIT		0x606
 
+#define CPU_NUM 8
+
 typedef struct {
     const char *events;
     int num_groups;

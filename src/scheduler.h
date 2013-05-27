@@ -15,6 +15,9 @@
 
 #include "perf_util.h"
 
+#define NUMBER_OF_CORES 4
+#define THREAD_PER_CORE 2
+
 #define MAX_RUNNING_PROCESS CPU_SETSIZE
 
 struct proc {
@@ -25,7 +28,7 @@ struct proc {
 
 typedef struct proc process;
 
-void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus);
+void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_matrix[][10]);
 int getRunningProcess ();
 bool filter (char *str1);
 inline int getNext (bool ifUsed[], int offset);
