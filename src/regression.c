@@ -2,7 +2,6 @@
 
 inline double regression_smt (double x1, double x2, double x3, double x4, double x5, double x6, double x7, double x8,
 	double x9, double x10, double x11, double x12, double x13, double x14, double x15, double x16) {
-LINE_1:
 	if ( x5<0.254875 )
 		goto LINE_2;
 	else if ( x5>=0.254875 )
@@ -3896,7 +3895,6 @@ LINE_865:
 
 inline double regression_cmp (double x1, double x2, double x3, double x4, double x5, double x6, double x7, double x8,
 	double x9, double x10, double x11, double x12, double x13, double x14, double x15, double x16) {
-LINE_1:
 	if ( x5<0.254875 )
 		goto LINE_2;
 	else if ( x5>=0.254875 )
