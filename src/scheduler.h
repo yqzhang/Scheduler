@@ -18,6 +18,8 @@
 #define NUMBER_OF_CORES 4
 #define THREAD_PER_CORE 2
 
+#define CPU_NUM 8
+
 #define MAX_RUNNING_PROCESS CPU_SETSIZE
 
 struct proc {

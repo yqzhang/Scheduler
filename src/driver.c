@@ -8,7 +8,7 @@
 
 perf_event_desc_t **all_fds = NULL;
 int *num_fds = NULL;
-static double pmu_matrix[CPU_SETSIZE][10];
+static double pmu_matrix[CPU_NUM][10];
 
 int main(int argc, char **argv) {
   // Initialize the events to measure

@@ -8,7 +8,7 @@
 #include "regression.h"
 
 static process proc_list[MAX_RUNNING_PROCESS];
-static float benefit_matrix[CPU_SETSIZE][CPU_SETSIZE];
+static float benefit_matrix[CPU_NUM][CPU_NUM];
 
 void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_matrix[][10]) {
   int num_proc = getRunningProcess();
@@ -18,8 +18,8 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_
 
   // Calculate the benefit matrix
   // Regression model
-  for (i = 0; i < CPU_SETSIZE; i++) {
-    for (j = 0; j < CPU_SETSIZE; j++) {
+  for (i = 0; i < CPU_NUM; i++) {
+    for (j = 0; j < CPU_NUM; j++) {
       // TODO: Result of the regression model
       benefit_matrix[i][j] = 1;
       if (i >= num_proc || j >= num_proc) continue;
@@ -36,7 +36,7 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_
 
   /* print the pmu counters for debug */
   printf("---------------------------------------\n");
-  for (i = 0; i < CPU_SETSIZE; i++) {
+  for (i = 0; i < CPU_NUM; i++) {
     for (j = 0; j < 10; j++) {
       printf("PMU_%d: %lf\t", j, pmu_matrix[i][j]);
     }
@@ -48,12 +48,12 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_
   // Calculate the best mapping
   // Brute force
   // TODO
-  bool ifUsed[CPU_SETSIZE];
+  bool ifUsed[CPU_NUM];
   int best_sol = 0;
   float best_val = -10000.0;
   for (i = 0; i < 105; i++) {
     float cur_val = 0.0;
-    for (j = 0; j < CPU_SETSIZE; j++) ifUsed[j] = false;
+    for (j = 0; j < CPU_NUM; j++) ifUsed[j] = false;
     
     // 1st Core
     int left = getNext (ifUsed, 0);
@@ -81,8 +81,8 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_
     }
   }
 
-  int map[CPU_SETSIZE];
-  for (j = 0; j < CPU_SETSIZE; j++) ifUsed[j] = false;
+  int map[CPU_NUM];
+  for (j = 0; j < CPU_NUM; j++) ifUsed[j] = false;
   map[getNext (ifUsed, 0)] = 0;
   map[getNext (ifUsed, best_sol / 15)] = 0;
   map[getNext (ifUsed, 0)] = 1;
@@ -97,7 +97,7 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_
   int perm[] = {0, 1, 2, 3};
   int best_mig[] = {0, 1, 2, 3};
   bool ifFinished = false;
-  int minMigration = CPU_SETSIZE;
+  int minMigration = CPU_NUM;
   while (ifFinished) {
     int mig = calculateMigration (map, perm, num_proc);
     if (mig < minMigration) {
@@ -108,7 +108,7 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_
       best_mig[3] = perm[3];
     }
 
-    for (i = CPU_SETSIZE / 2 - 2; i >= 0; i--) {
+    for (i = CPU_NUM / 2 - 2; i >= 0; i--) {
       if (perm[i] < perm[i + 1]) {
         break;
       }
@@ -116,29 +116,29 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_
 
     if (i == -1) ifFinished = true;
     else {
-      int ceilIndex = findCeil (perm, perm[i], i + 1, CPU_SETSIZE - 1);
+      int ceilIndex = findCeil (perm, perm[i], i + 1, CPU_NUM - 1);
       swap (&perm[i], &perm[ceilIndex]);
-      reverse (perm, i + 1, CPU_SETSIZE - 1);
+      reverse (perm, i + 1, CPU_NUM - 1);
     }
   }
 
   // Calculate affinity
-  for (i = 0; i < CPU_SETSIZE; i++) ifUsed[i] = false;
+  for (i = 0; i < CPU_NUM; i++) ifUsed[i] = false;
   for (i = 0; i < num_proc; i++) {
-    if (proc_list[i].affinity % (CPU_SETSIZE / 2) == best_mig[map[i]]) {
+    if (proc_list[i].affinity % (CPU_NUM / 2) == best_mig[map[i]]) {
       ifUsed[proc_list[i].affinity] = true;
       proc_list[i].migrate = proc_list[i].affinity;
     }
   }
   for (i = 0; i < num_proc; i++) {
-    if (proc_list[i].affinity % (CPU_SETSIZE / 2) != best_mig[map[i]]) {
+    if (proc_list[i].affinity % (CPU_NUM / 2) != best_mig[map[i]]) {
       if (ifUsed[best_mig[map[i]]] == false) {
         ifUsed[best_mig[map[i]]] = true;
         proc_list[i].migrate = best_mig[map[i]];
       }
       else {
-        ifUsed[best_mig[map[i]] + (CPU_SETSIZE / 2)] = true;
-        proc_list[map[i]].migrate = best_mig[map[i]] + (CPU_SETSIZE / 2);
+        ifUsed[best_mig[map[i]] + (CPU_NUM / 2)] = true;
+        proc_list[map[i]].migrate = best_mig[map[i]] + (CPU_NUM / 2);
       }
     }
   }
@@ -229,7 +229,7 @@ int calculateMigration (int map[], int perm[], int num_proc) {
   int mig = 0;
   int i;
   for (i = 0; i < num_proc; i++) {
-    if (proc_list[i].affinity % (CPU_SETSIZE / 2) != perm[map[i]]) {
+    if (proc_list[i].affinity % (CPU_NUM / 2) != perm[map[i]]) {
       mig++;
     }
   }
