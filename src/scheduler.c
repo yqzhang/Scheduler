@@ -5,6 +5,7 @@
  */
 
 #include "scheduler.h"
+#include "regression.h"
 
 static process proc_list[MAX_RUNNING_PROCESS];
 static float benefit_matrix[CPU_SETSIZE][CPU_SETSIZE];
