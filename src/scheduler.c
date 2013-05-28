@@ -67,7 +67,7 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_
                 pmu_matrix[right][6] / pmu_matrix[right][1],
                 pmu_matrix[right][7] / pmu_matrix[right][1],
                 pmu_matrix[right][8] / pmu_matrix[right][1],
-                pmu_matrix[right][9] / pmu_matrix[right][1]) * 0.82;
+                pmu_matrix[right][9] / pmu_matrix[right][1]) * 0.98;
       }
     }
   }
@@ -168,31 +168,41 @@ void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_
 */
   // Calculate the best migration solution
   // Brute force
-  int perm[] = {0, 1, 2, 3};
+  int perm[24][4] = {
+      {0, 1, 2, 3},
+      {0, 1, 3, 2},
+      {0, 2, 1, 3},
+      {0, 2, 3, 1},
+      {0, 3, 1, 2},
+      {0, 3, 2, 1},
+      {1, 0, 2, 3},
+      {1, 0, 3, 2},
+      {1, 2, 0, 3},
+      {1, 2, 3, 0},
+      {1, 3, 0, 2},
+      {1, 3, 2, 0},
+      {2, 0, 1, 3},
+      {2, 0, 3, 1},
+      {2, 1, 0, 3},
+      {2, 1, 3, 0},
+      {2, 3, 0, 1},
+      {2, 3, 1, 0},
+      {3, 0, 1, 2},
+      {3, 0, 2, 1},
+      {3, 1, 0, 2},
+      {3, 1, 2, 0},
+      {3, 2, 0, 1},
+      {3, 2, 1, 0}};
   int best_mig[] = {0, 1, 2, 3};
-  bool ifFinished = false;
   int minMigration = CPU_NUM;
-  while (ifFinished) {
-    int mig = calculateMigration (map, perm, num_proc);
+  for (i = 0; i < 24; i++) {
+    int mig = calculateMigration (map, perm[i], num_proc);
     if (mig < minMigration) {
       minMigration = mig;
-      best_mig[0] = perm[0];
-      best_mig[1] = perm[1];
-      best_mig[2] = perm[2];
-      best_mig[3] = perm[3];
-    }
-
-    for (i = CPU_NUM / 2 - 2; i >= 0; i--) {
-      if (perm[i] < perm[i + 1]) {
-        break;
-      }
-    }
-
-    if (i == -1) ifFinished = true;
-    else {
-      int ceilIndex = findCeil (perm, perm[i], i + 1, CPU_NUM - 1);
-      swap (&perm[i], &perm[ceilIndex]);
-      reverse (perm, i + 1, CPU_NUM - 1);
+      best_mig[0] = perm[i][0];
+      best_mig[1] = perm[i][1];
+      best_mig[2] = perm[i][2];
+      best_mig[3] = perm[i][3];
     }
   }
 /*
@@ -292,6 +302,8 @@ bool filter (char *str1) {
   if (strstr (str1, "onlineSch") != NULL)
     return false;
   if (strstr (str1, "base") != NULL)
+    return true;
+  if (strstr (str1, "sphinx") != NULL)
     return true;
   return false;
 }
