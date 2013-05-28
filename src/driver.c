@@ -84,7 +84,7 @@ void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period, 
   double energy_units;//, power_units, time_units;
   long long result, result_before, result_after;
   int64_t result_delta;
-  double package_power;
+  double package_power = 0;
 
   result = read_msr (energy_fd, MSR_RAPL_POWER_UNIT);
   //power_units = pow (0.5, (double)(result & 0xf));
@@ -112,8 +112,8 @@ void measure (perf_event_desc_t **all_fds, int *num_fds, int ncpus, int period, 
     else {
         result_delta = (int64_t) result_after - (int64_t) result_before;
     }
-    package_power = (double) result_delta * energy_units;
-    printf("Package power: %.6fJ consumed\n", package_power);
+    package_power += (double) result_delta * energy_units;
+    printf("[LOG] total energy consumption: %.6fJ consumed\n", package_power);
     result_before = result_after;
   }
 }
