@@ -30,13 +30,14 @@ struct proc {
 
 typedef struct proc process;
 
-void schedule (perf_event_desc_t **all_fds, int *num_fds, int ncpus, double pmu_matrix[][10]);
-int getRunningProcess ();
-bool filter (char *str1);
-inline int getNext (bool ifUsed[], int offset);
-void swap (int *a, int *b);
-int findCeil (int perm[], int first, int l, int h);
-void reverse (int perm[], int l, int h);
-int calculateMigration (int map[], int perm[], int num_proc);
+void schedule(perf_event_desc_t **all_fds, int *num_fds, int ncpus,
+              double pmu_matrix[][10]);
+int getRunningProcess();
+bool filter(char *str1);
+inline int getNext(bool ifUsed[], int offset);
+void swap(int *a, int *b);
+int findCeil(int perm[], int first, int l, int h);
+void reverse(int perm[], int l, int h);
+int calculateMigration(int map[], int perm[], int num_proc);
 
 #endif
